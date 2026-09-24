@@ -6,7 +6,7 @@ public class PlayerMovement2D : NetworkBehaviour
     [Header("Configuración")]
     [SerializeField] private float moveSpeed = 5f;
 
-    private Rigidbody2D rb;
+    public  Rigidbody2D rb;
     private Vector2 moveInput;
 
     private void Awake()
