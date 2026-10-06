@@ -16,6 +16,11 @@ public class PlayerMovement2D : NetworkBehaviour
     private SpriteRenderer spriteRenderer;
     private Vector2 moveInput;
 
+    [Header("Interacción")]
+    [SerializeField] private float grabRadius = 1.5f;
+    [SerializeField] private LayerMask itemLayer;
+    private GrabbableItem heldItem;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -32,17 +37,76 @@ public class PlayerMovement2D : NetworkBehaviour
 
         
         moveInput = new Vector2(moveX, moveY).normalized;
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            if (heldItem == null)
+            {
+                TryGrabNearbyItem();
+            }
+            else
+            {
+                CmdDropItem(heldItem.gameObject);
+                heldItem = null;
+            }
+        }
+    }
+
+    private void TryGrabNearbyItem()
+    {
+        // Buscar objetos cercanos en el radio
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, grabRadius, itemLayer);
+        if (hit != null && hit.TryGetComponent<GrabbableItem>(out GrabbableItem item))
+        {
+            // Solo si nadie más lo tiene agarrado
+            if (item.currentHolder == null)
+            {
+                heldItem = item;
+                CmdGrabItem(item.gameObject);
+            }
+        }
+    }
+
+    [Command]
+    private void CmdGrabItem(GameObject itemObject)
+    {
+        if (itemObject.TryGetComponent<GrabbableItem>(out GrabbableItem item))
+        {
+            if (item.currentHolder == null)
+            {
+                item.Grab(netIdentity);
+            }
+        }
+    }
+
+    [Command]
+    private void CmdDropItem(GameObject itemObject)
+    {
+        if (itemObject.TryGetComponent<GrabbableItem>(out GrabbableItem item))
+        {
+            if (item.currentHolder == netIdentity)
+            {
+                item.Drop();
+            }
+        }
     }
 
     private void FixedUpdate()
     {
         if (!isLocalPlayer) return;
 
-        // Mantener velocidad de movimiento solo si no está bajo un impulso fuerte de choque
+        // Si el jugador está presionando teclas, asigna la velocidad de movimiento directo
         if (moveInput != Vector2.zero)
         {
             rb.linearVelocity = moveInput * moveSpeed;
-            // Si tu Unity marca error en linearVelocity, usa: rb.velocity = moveInput * moveSpeed;
+        }
+        else
+        {
+            // Si no presiona nada y la velocidad residual es baja (no está volando por un choque), frena a cero
+            if (rb.linearVelocity.magnitude < moveSpeed)
+            {
+                rb.linearVelocity = Vector2.zero;
+            }
         }
     }
 
