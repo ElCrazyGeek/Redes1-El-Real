@@ -3,33 +3,37 @@ using Mirror;
 
 public class GrabbableItem : NetworkBehaviour
 {
-    // Guarda qué jugador lo tiene cargado actualmente (null si está en el suelo)
     [SyncVar(hook = nameof(OnHolderChanged))]
     public NetworkIdentity currentHolder;
 
     private Rigidbody2D rb;
     private Collider2D col;
 
+    [SerializeField] private AudioClip bounceSound;
+    private AudioSource audioSource;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
+        audioSource = GetComponent<AudioSource>();
     }
 
-    // Hook: se ejecuta en todos los clientes cuando alguien agarra o suelta el objeto
     private void OnHolderChanged(NetworkIdentity oldHolder, NetworkIdentity newHolder)
     {
         if (newHolder != null)
         {
-            // Se emparenta visualmente al jugador
             transform.SetParent(newHolder.transform);
-            transform.localPosition = new Vector3(0, 0.7f, 0); // posición arriba de la cabeza
-            if (rb != null) rb.bodyType = RigidbodyType2D.Kinematic;
-            if (col != null) col.enabled = false; // evitar chocar con quien lo carga
+            transform.localPosition = new Vector3(0, 0.7f, 0);
+            if (rb != null)
+            {
+                rb.bodyType = RigidbodyType2D.Kinematic;
+                rb.linearVelocity = Vector2.zero;
+            }
+            if (col != null) col.enabled = false;
         }
         else
         {
-            // Se suelta en el suelo
             transform.SetParent(null);
             if (rb != null) rb.bodyType = RigidbodyType2D.Dynamic;
             if (col != null) col.enabled = true;
@@ -46,5 +50,39 @@ public class GrabbableItem : NetworkBehaviour
     public void Drop()
     {
         currentHolder = null;
+    }
+
+    // Este es el método que te hace falta agregar:
+    [Server]
+    public void Throw(Vector2 throwDirection, float force)
+    {
+        currentHolder = null; // Libera el objeto para que caiga al suelo
+
+        if (rb != null)
+        {
+            transform.position += (Vector3)(throwDirection * 0.4f);
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.linearVelocity = Vector2.zero;
+            rb.AddForce(throwDirection * force, ForceMode2D.Impulse);
+        }
+    }
+
+    [ServerCallback]
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        // Si no lo tiene nadie agarrado y choca contra algo con velocidad
+        if (currentHolder == null && collision.relativeVelocity.magnitude > 1.5f)
+        {
+            RpcPlayBounceSound();
+        }
+    }
+
+    [ClientRpc]
+    private void RpcPlayBounceSound()
+    {
+        if (audioSource != null && bounceSound != null)
+        {
+            audioSource.PlayOneShot(bounceSound);
+        }
     }
 }

@@ -107,7 +107,7 @@ CircleCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 1108664dd1a0d684c8482d7152b6dc27, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -132,7 +132,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
+  m_Radius: 0.51
 --- !u!50 &8082444428063699434
 Rigidbody2D:
   serializedVersion: 5
@@ -226,4 +226,5 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  currentHolder: {fileID: 0}
+  currentHolder: {fileID: 3760137290599724173}
+  bounceSound: {fileID: 8300000, guid: 03dcf882385799e41be6037612d01e69, type: 3}
