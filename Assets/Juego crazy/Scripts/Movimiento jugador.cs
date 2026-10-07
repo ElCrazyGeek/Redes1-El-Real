@@ -12,58 +12,101 @@ public class PlayerMovement2D : NetworkBehaviour
 
     public Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
-    private AudioSource audioSource;
+    private Camera mainCamera;
     private Vector2 moveInput;
-
-    [Header("Efectos de Sonido")]
-    [SerializeField] private AudioClip hitSound;
-    [SerializeField] private AudioClip grabSound;
-    [SerializeField] private AudioClip throwSound;
 
     [Header("Interacción y Pase")]
     [SerializeField] private float grabRadius = 1.5f;
     [SerializeField] private LayerMask itemLayer;
-    [SerializeField] private float throwForce = 12f;
+    [SerializeField] private float throwForce = 14f; // Fuerza del pase con clic
 
     private GrabbableItem heldItem;
-    private Vector2 lastFacingDir = Vector2.right;
+
+    [Header("Sonidos")]
+    [SerializeField] private AudioClip grabSound;
+    [SerializeField] private AudioClip throwSound;
+    [SerializeField] private AudioClip bumpSound;
+    private AudioSource audioSource;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        mainCamera = Camera.main;
+
         audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
     }
 
     private void Update()
     {
+        // Solo la máquina dueña de este personaje procesa input y mira hacia su propio mouse
         if (!isLocalPlayer) return;
 
+        // --- 1. MOVIMIENTO DE EJES ---
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
-
         moveInput = new Vector2(moveX, moveY).normalized;
 
-        if (moveInput != Vector2.zero)
-        {
-            lastFacingDir = moveInput;
-        }
+        // --- 2. ROTAR HACIA EL CURSOR DEL MOUSE ---
+        RotateTowardsMouse();
 
+        // --- 3. AGARRAR CON TECLA 'E' ---
         if (Input.GetKeyDown(KeyCode.E))
         {
             if (heldItem == null)
             {
                 TryGrabNearbyItem();
             }
-            else
+        }
+
+        // --- 4. LANZAR CON CLIC IZQUIERDO ---
+        if (Input.GetMouseButtonDown(0)) // 0 = Clic izquierdo
+        {
+            if (heldItem != null)
             {
-                Vector2 passDirection = moveInput != Vector2.zero ? moveInput : lastFacingDir;
-                CmdThrowItem(heldItem.gameObject, passDirection, throwForce);
-                heldItem = null;
+                ThrowItemTowardsMouse();
             }
         }
     }
 
+    private void RotateTowardsMouse()
+    {
+        if (mainCamera == null) mainCamera = Camera.main;
+        if (mainCamera == null) return;
+
+        // Obtenemos la posición del mouse proyectada en el plano Z = 0 del juego
+        Vector3 mouseScreen = Input.mousePosition;
+        mouseScreen.z = Mathf.Abs(mainCamera.transform.position.z - transform.position.z);
+        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(mouseScreen);
+
+        Vector2 lookDir = (Vector2)mouseWorldPos - (Vector2)transform.position;
+
+        if (lookDir.sqrMagnitude > 0.001f)
+        {
+            float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
+
+            // Asignamos la rotación directo al transform y al Rigidbody
+            transform.rotation = Quaternion.Euler(0, 0, angle);
+            if (rb != null) rb.rotation = angle;
+        }
+    }
+
+    private void ThrowItemTowardsMouse()
+    {
+        if (mainCamera == null) mainCamera = Camera.main;
+        if (mainCamera == null) return;
+
+        Vector3 mouseScreen = Input.mousePosition;
+        mouseScreen.z = Mathf.Abs(mainCamera.transform.position.z - transform.position.z);
+        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(mouseScreen);
+
+        Vector2 aimDirection = ((Vector2)mouseWorldPos - (Vector2)transform.position).normalized;
+
+        CmdThrowItem(heldItem.gameObject, aimDirection, throwForce);
+        heldItem = null;
+    }
     private void TryGrabNearbyItem()
     {
         Collider2D hit = Physics2D.OverlapCircle(transform.position, grabRadius, itemLayer);
@@ -85,19 +128,7 @@ public class PlayerMovement2D : NetworkBehaviour
             if (item.currentHolder == null)
             {
                 item.Grab(netIdentity);
-                RpcPlaySound(1); // 1 = Sonido de agarrar
-            }
-        }
-    }
-
-    [Command]
-    private void CmdDropItem(GameObject itemObject)
-    {
-        if (itemObject != null && itemObject.TryGetComponent<GrabbableItem>(out GrabbableItem item))
-        {
-            if (item.currentHolder == netIdentity)
-            {
-                item.Drop();
+                RpcPlayGrabSound();
             }
         }
     }
@@ -110,8 +141,26 @@ public class PlayerMovement2D : NetworkBehaviour
             if (item.currentHolder == netIdentity)
             {
                 item.Throw(direction, force);
-                RpcPlaySound(2); // 2 = Sonido de pase/lanzamiento
+                RpcPlayThrowSound();
             }
+        }
+    }
+
+    [ClientRpc]
+    private void RpcPlayGrabSound()
+    {
+        if (grabSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(grabSound);
+        }
+    }
+
+    [ClientRpc]
+    private void RpcPlayThrowSound()
+    {
+        if (throwSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(throwSound);
         }
     }
 
@@ -148,7 +197,6 @@ public class PlayerMovement2D : NetworkBehaviour
 
             Vector2 pushDirection = (transform.position - collision.transform.position).normalized;
             RpcApplyKnockback(pushDirection * bounceForce);
-            RpcPlaySound(0); // 0 = Sonido de golpe/choque
         }
     }
 
@@ -159,25 +207,10 @@ public class PlayerMovement2D : NetworkBehaviour
         {
             rb.AddForce(force, ForceMode2D.Impulse);
         }
-    }
 
-    // Este ClientRpc ejecuta el sonido en todas las ventanas a la vez
-    [ClientRpc]
-    private void RpcPlaySound(int soundId)
-    {
-        if (audioSource == null) return;
-
-        switch (soundId)
+        if (bumpSound != null && audioSource != null)
         {
-            case 0: // Choque
-                if (hitSound != null) audioSource.PlayOneShot(hitSound);
-                break;
-            case 1: // Agarrar
-                if (grabSound != null) audioSource.PlayOneShot(grabSound);
-                break;
-            case 2: // Pase
-                if (throwSound != null) audioSource.PlayOneShot(throwSound);
-                break;
+            audioSource.PlayOneShot(bumpSound);
         }
     }
 }
