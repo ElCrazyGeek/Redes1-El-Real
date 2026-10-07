@@ -1,5 +1,6 @@
+using System.Collections;
 using UnityEngine;
-using TMPro; // Usando TextMeshPro para UI nítida
+using TMPro;
 using Mirror;
 
 public class Marcador : NetworkBehaviour
@@ -7,7 +8,6 @@ public class Marcador : NetworkBehaviour
     public static Marcador Instance;
 
     [Header("Marcador")]
-    // SyncVars: el servidor las modifica y se replican a todos los jugadores
     [SyncVar(hook = nameof(OnScoreAChanged))]
     private int scoreTeamA = 0;
 
@@ -15,11 +15,15 @@ public class Marcador : NetworkBehaviour
     private int scoreTeamB = 0;
 
     [Header("UI")]
-    [SerializeField] private TextMeshProUGUI scoreText; // Asignar el texto en el canvas
+    [SerializeField] private TextMeshProUGUI scoreText;
 
-    [Header("Audio de Gol")]
+    [Header("Audio y Tiempos de Gol")]
     [SerializeField] private AudioClip goalSound;
+    [Tooltip("Tiempo de espera en segundos tras anotar")]
+    [SerializeField] private float goalResetDelay = 3f; // Aquí eliges el tiempo
     private AudioSource audioSource;
+
+    private bool isHandlingGoal = false; // Evita que se cobren goles dobles durante el festejo
 
     private void Awake()
     {
@@ -28,7 +32,11 @@ public class Marcador : NetworkBehaviour
         if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
     }
 
-    // Actualizar visualmente la UI en los clientes
+    private void Start()
+    {
+        UpdateScoreDisplay(scoreTeamA, scoreTeamB);
+    }
+
     private void OnScoreAChanged(int oldVal, int newVal)
     {
         UpdateScoreDisplay(newVal, scoreTeamB);
@@ -47,38 +55,79 @@ public class Marcador : NetworkBehaviour
         }
     }
 
-    // Solo el servidor otorga puntos
     [Server]
     public void AddGoal(int teamId, GameObject ball)
     {
+        // Si ya se está procesando un gol, ignoramos para no duplicar puntos
+        if (isHandlingGoal) return;
+
+        isHandlingGoal = true;
+
         if (teamId == 1) scoreTeamA++;
         else scoreTeamB++;
 
         // Sonido de gol a todos los clientes
         RpcPlayGoalEffect();
 
-        // Reiniciar la posición del balón al centro
-        if (ball != null)
-        {
-            ResetBall(ball);
-        }
+        // Si prefieres que el delay coincida exactamente con la duración del audio:
+        // float delay = goalSound != null ? goalSound.length : goalResetDelay;
+
+        // Arrancamos la pausa en el servidor
+        StartCoroutine(GoalDelayRoutine(ball, goalResetDelay));
     }
 
     [Server]
-    private void ResetBall(GameObject ball)
+    private IEnumerator GoalDelayRoutine(GameObject ball, float delay)
     {
-        // Si alguien lo tenía agarrado, soltarlo
-        if (ball.TryGetComponent<GrabbableItem>(out GrabbableItem item))
+        // 1. Pausar física y soltar el balón
+        if (ball != null)
         {
-            item.Drop();
+            if (ball.TryGetComponent<GrabbableItem>(out GrabbableItem item))
+            {
+                item.Drop();
+            }
+
+            if (ball.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
+            {
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+                rb.simulated = false; // Desactiva físicas durante la pausa
+            }
+
+            // Opcional: Ocultar el balón o dejarlo quieto en la portería
+            RpcSetBallVisibility(ball, false);
         }
 
-        // Posicionar en el centro (0, 0) y quitar velocidad
-        ball.transform.position = Vector3.zero;
-        if (ball.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
+        // 2. Esperar el tiempo configurado
+        yield return new WaitForSeconds(delay);
+
+        // 3. Reubicar al centro (0, 0) y reactivar físicas
+        if (ball != null)
         {
-            rb.linearVelocity = Vector2.zero;
-            rb.angularVelocity = 0f;
+            ball.transform.position = Vector3.zero;
+
+            if (ball.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
+            {
+                rb.simulated = true;
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+            }
+
+            RpcSetBallVisibility(ball, true);
+        }
+
+        isHandlingGoal = false;
+    }
+
+    [ClientRpc]
+    private void RpcSetBallVisibility(GameObject ball, bool visible)
+    {
+        if (ball != null)
+        {
+            if (ball.TryGetComponent<SpriteRenderer>(out SpriteRenderer sr))
+            {
+                sr.enabled = visible;
+            }
         }
     }
 

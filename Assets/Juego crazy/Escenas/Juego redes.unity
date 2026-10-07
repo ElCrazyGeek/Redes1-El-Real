@@ -1847,11 +1847,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7009993830881315250, guid: 3499dec43a891e74ca629be669bd6ca7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.54
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 7009993830881315250, guid: 3499dec43a891e74ca629be669bd6ca7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.9
+      value: 1.02
       objectReference: {fileID: 0}
     - target: {fileID: 7009993830881315250, guid: 3499dec43a891e74ca629be669bd6ca7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2900,7 +2900,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.452
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -2999,8 +2999,9 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  scoreText: {fileID: 0}
+  scoreText: {fileID: 1011830032}
   goalSound: {fileID: 8300000, guid: ffe3147b713b8954e95bdef2f6e5ef55, type: 3}
+  goalResetDelay: 3
 --- !u!4 &1576080285
 Transform:
   m_ObjectHideFlags: 0

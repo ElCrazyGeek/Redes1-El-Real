@@ -106,7 +106,7 @@ public class PlayerMovement2D : NetworkBehaviour
 
         CmdThrowItem(heldItem.gameObject, aimDirection, throwForce);
         heldItem = null;
-    }
+    } 
     private void TryGrabNearbyItem()
     {
         Collider2D hit = Physics2D.OverlapCircle(transform.position, grabRadius, itemLayer);
