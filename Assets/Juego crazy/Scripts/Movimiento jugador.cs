@@ -39,6 +39,18 @@ public class PlayerMovement2D : NetworkBehaviour
         audioSource.playOnAwake = false;
     }
 
+    public override void OnStartLocalPlayer()
+    {
+        base.OnStartLocalPlayer();
+
+        // Busca la cámara que está dentro de este prefab y la enciende únicamente en la pantalla del dueño
+        Camera playerCam = GetComponentInChildren<Camera>(true);
+        if (playerCam != null)
+        {
+            playerCam.gameObject.SetActive(true);
+        }
+    }
+
     private void Update()
     {
         // Solo la máquina dueña de este personaje procesa input y mira hacia su propio mouse
