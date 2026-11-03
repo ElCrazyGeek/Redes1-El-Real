@@ -4,12 +4,11 @@ using TMPro;
 
 public class PlayerName : NetworkBehaviour
 {
-    
     [SyncVar(hook = nameof(OnNameChanged))]
     public string playerName;
 
     [Header("UI")]
-    [SerializeField] private TMP_Text nameText; 
+    [SerializeField] private TMP_Text nameText;
 
     public override void OnStartServer()
     {
