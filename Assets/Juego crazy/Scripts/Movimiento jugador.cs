@@ -18,21 +18,25 @@ public class PlayerMovement2D : NetworkBehaviour
     [Header("Interacción y Pase")]
     [SerializeField] private float grabRadius = 1.5f;
     [SerializeField] private LayerMask itemLayer;
-    [SerializeField] private float throwForce = 14f; // Fuerza del pase con clic
+    [SerializeField] private float throwForce = 14f;
 
     private GrabbableItem heldItem;
 
-    [Header("Sonidos")]
+    [Header("Sonidos y Animación")]
     [SerializeField] private AudioClip grabSound;
     [SerializeField] private AudioClip throwSound;
     [SerializeField] private AudioClip bumpSound;
     private AudioSource audioSource;
+    private Animator anim;
+    private NetworkAnimator networkAnimator;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         mainCamera = Camera.main;
+        anim = GetComponent<Animator>();
+        networkAnimator = GetComponent<NetworkAnimator>();
 
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
@@ -43,7 +47,6 @@ public class PlayerMovement2D : NetworkBehaviour
     {
         base.OnStartLocalPlayer();
 
-        // Busca la cámara que está dentro de este prefab y la enciende únicamente en la pantalla del dueño
         Camera playerCam = GetComponentInChildren<Camera>(true);
         if (playerCam != null)
         {
@@ -53,13 +56,18 @@ public class PlayerMovement2D : NetworkBehaviour
 
     private void Update()
     {
-        // Solo la máquina dueña de este personaje procesa input y mira hacia su propio mouse
         if (!isLocalPlayer) return;
 
         // --- 1. MOVIMIENTO DE EJES ---
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
         moveInput = new Vector2(moveX, moveY).normalized;
+
+        // Sincronizar parámetro de caminata en el Animator
+        if (anim != null)
+        {
+            anim.SetFloat("Movimiento", moveInput.sqrMagnitude);
+        }
 
         // --- 2. ROTAR HACIA EL CURSOR DEL MOUSE ---
         RotateTowardsMouse();
@@ -73,12 +81,22 @@ public class PlayerMovement2D : NetworkBehaviour
             }
         }
 
-        // --- 4. LANZAR CON CLIC IZQUIERDO ---
-        if (Input.GetMouseButtonDown(0)) // 0 = Clic izquierdo
+        // --- 4. LANZAR Y PATEAR CON CLIC IZQUIERDO ---
+        if (Input.GetMouseButtonDown(0))
         {
             if (heldItem != null)
             {
                 ThrowItemTowardsMouse();
+
+                // Disparo de trigger replicado por NetworkAnimator
+                if (networkAnimator != null)
+                {
+                    networkAnimator.SetTrigger("Patear");
+                }
+                else if (anim != null)
+                {
+                    anim.SetTrigger("Patear");
+                }
             }
         }
     }
@@ -88,7 +106,6 @@ public class PlayerMovement2D : NetworkBehaviour
         if (mainCamera == null) mainCamera = Camera.main;
         if (mainCamera == null) return;
 
-        // Obtenemos la posición del mouse proyectada en el plano Z = 0 del juego
         Vector3 mouseScreen = Input.mousePosition;
         mouseScreen.z = Mathf.Abs(mainCamera.transform.position.z - transform.position.z);
         Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(mouseScreen);
@@ -98,8 +115,6 @@ public class PlayerMovement2D : NetworkBehaviour
         if (lookDir.sqrMagnitude > 0.001f)
         {
             float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
-
-            // Asignamos la rotación directo al transform y al Rigidbody
             transform.rotation = Quaternion.Euler(0, 0, angle);
             if (rb != null) rb.rotation = angle;
         }
@@ -118,7 +133,8 @@ public class PlayerMovement2D : NetworkBehaviour
 
         CmdThrowItem(heldItem.gameObject, aimDirection, throwForce);
         heldItem = null;
-    } 
+    }
+
     private void TryGrabNearbyItem()
     {
         Collider2D hit = Physics2D.OverlapCircle(transform.position, grabRadius, itemLayer);
@@ -218,6 +234,11 @@ public class PlayerMovement2D : NetworkBehaviour
         if (rb != null)
         {
             rb.AddForce(force, ForceMode2D.Impulse);
+        }
+
+        if (anim != null)
+        {
+            anim.SetTrigger("Golpe");
         }
 
         if (bumpSound != null && audioSource != null)

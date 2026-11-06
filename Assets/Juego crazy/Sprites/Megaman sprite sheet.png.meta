@@ -1,0 +1,732 @@
+fileFormatVersion: 2
+guid: 9f38675ca34783a45abbbda3f15bd70a
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Megaman sprite sheet_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 828
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2f577be6952654a4aba0df234e687be9
+      internalID: -1713682419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_1
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 828
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3fe67ee42fc2f2a45be1e982037afcf5
+      internalID: 629503732
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_2
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 828
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0117c22d3c56af64cb9d3f67b148eb1c
+      internalID: -2022049068
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_3
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 828
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dcbfa2499bbd90047bd374a24b547b00
+      internalID: -104234673
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_4
+      rect:
+        serializedVersion: 2
+        x: 660
+        y: 828
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e70d35807374e3c4d86e9f4945ce3d81
+      internalID: -1269678204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 663
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1a322d5f8d652934c80cf9b59a5e8a98
+      internalID: -177988880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_6
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 663
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 87aed60ba74b84848a70ea9368eb7ead
+      internalID: 1382517164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_7
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 663
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1db619d869a8a4c4b98467e81c1b3714
+      internalID: 1626485445
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_8
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 663
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33d6b9374b350a74d9ecf8624c3ba38a
+      internalID: 653901654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_9
+      rect:
+        serializedVersion: 2
+        x: 660
+        y: 663
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 74e39d9d4ebfe7d4fbc1a44bd123e8de
+      internalID: -1959955391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 498
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 398aac74868d4164e830cb80594aac1f
+      internalID: 299091564
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_11
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 498
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53f4f99da788d2944ad0e76771ddca11
+      internalID: 457396600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_12
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 498
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ea91349c9c900314b9e91bd26e6af4c9
+      internalID: 1256835342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_13
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 498
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 05aca37358e839543be7f810a43aa94e
+      internalID: 1105605488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_14
+      rect:
+        serializedVersion: 2
+        x: 660
+        y: 498
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9fc2a8790ba62c9488ab44c54d5a7ede
+      internalID: 58126225
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_15
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 333
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3aa4465572f8b07499156d4b23e4ffab
+      internalID: -1900201705
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_16
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 333
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0ed864dfb23e0fb46b2bfa6af560e1f8
+      internalID: 306675066
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_17
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 333
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 767db83ef6b14c541843cdaa2378184d
+      internalID: 1399639859
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_18
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 333
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3828caf546a6594e8eeff76662020a8
+      internalID: -2065827693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_19
+      rect:
+        serializedVersion: 2
+        x: 660
+        y: 333
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 50818c55e36f2564cbcfaaac964360f7
+      internalID: 1993668970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_20
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 168
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 030f2161f61b2784fb15624b0ec5c029
+      internalID: 387103836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_21
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 168
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ecd4ca1f00a302c43950868bfe816b77
+      internalID: -1152707866
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_22
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 168
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e5193aaca21eec34386fd2579b3249aa
+      internalID: -1840778934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_23
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 168
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f7d01cdc1df5a7441a5f8dfc9b6cc7e8
+      internalID: -1164624282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_24
+      rect:
+        serializedVersion: 2
+        x: 660
+        y: 168
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 907e679b934143045820107b8cb394e4
+      internalID: -566556339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Megaman sprite sheet_25
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3
+        width: 165
+        height: 165
+      alignment: 9
+      pivot: {x: 0.3752275, y: 0.08462062}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65032c4bdbfeb8640979f1b0e41e7aea
+      internalID: -812209563
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 69930bbade9c6844a886b843135e528e
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceOnImport
+        value: False
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":165.0,"y":165.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.37522751092910769,"y":0.08462061733007431},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":9,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      Megaman sprite sheet_0: -1713682419
+      Megaman sprite sheet_1: 629503732
+      Megaman sprite sheet_10: 299091564
+      Megaman sprite sheet_11: 457396600
+      Megaman sprite sheet_12: 1256835342
+      Megaman sprite sheet_13: 1105605488
+      Megaman sprite sheet_14: 58126225
+      Megaman sprite sheet_15: -1900201705
+      Megaman sprite sheet_16: 306675066
+      Megaman sprite sheet_17: 1399639859
+      Megaman sprite sheet_18: -2065827693
+      Megaman sprite sheet_19: 1993668970
+      Megaman sprite sheet_2: -2022049068
+      Megaman sprite sheet_20: 387103836
+      Megaman sprite sheet_21: -1152707866
+      Megaman sprite sheet_22: -1840778934
+      Megaman sprite sheet_23: -1164624282
+      Megaman sprite sheet_24: -566556339
+      Megaman sprite sheet_25: -812209563
+      Megaman sprite sheet_3: -104234673
+      Megaman sprite sheet_4: -1269678204
+      Megaman sprite sheet_5: -177988880
+      Megaman sprite sheet_6: 1382517164
+      Megaman sprite sheet_7: 1626485445
+      Megaman sprite sheet_8: 653901654
+      Megaman sprite sheet_9: -1959955391
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
