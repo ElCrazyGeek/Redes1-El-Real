@@ -21,6 +21,11 @@ public class Marcador : NetworkBehaviour
     [SerializeField] private AudioClip goalSound;
     [Tooltip("Tiempo de espera en segundos tras anotar")]
     [SerializeField] private float goalResetDelay = 3f; // Aquí eliges el tiempo
+
+    [Header("Efectos de Partículas")]
+    [SerializeField] private ParticleSystem goalParticlesA;
+    [SerializeField] private ParticleSystem goalParticlesB;
+
     private AudioSource audioSource;
 
     private bool isHandlingGoal = false; // Evita que se cobren goles dobles durante el festejo
@@ -58,22 +63,36 @@ public class Marcador : NetworkBehaviour
     [Server]
     public void AddGoal(int teamId, GameObject ball)
     {
-        // Si ya se está procesando un gol, ignoramos para no duplicar puntos
         if (isHandlingGoal) return;
-
         isHandlingGoal = true;
 
         if (teamId == 1) scoreTeamA++;
         else scoreTeamB++;
 
-        // Sonido de gol a todos los clientes
-        RpcPlayGoalEffect();
+        // Enviamos a todos los clientes qué equipo/portería debe lanzar partículas
+        RpcPlayGoalEffect(teamId);
 
-        // Si prefieres que el delay coincida exactamente con la duración del audio:
-        // float delay = goalSound != null ? goalSound.length : goalResetDelay;
-
-        // Arrancamos la pausa en el servidor
         StartCoroutine(GoalDelayRoutine(ball, goalResetDelay));
+    }
+
+    [ClientRpc]
+    private void RpcPlayGoalEffect(int teamId)
+    {
+        // 1. Sonido de gol en todas las pantallas
+        if (goalSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(goalSound);
+        }
+
+        // 2. Detonar las partículas en la portería correspondiente
+        if (teamId == 1 && goalParticlesA != null)
+        {
+            goalParticlesA.Play();
+        }
+        else if (teamId == 2 && goalParticlesB != null)
+        {
+            goalParticlesB.Play();
+        }
     }
 
     [Server]
