@@ -110,17 +110,22 @@ public class Marcador : NetworkBehaviour
             {
                 rb.linearVelocity = Vector2.zero;
                 rb.angularVelocity = 0f;
-                rb.simulated = false; // Desactiva físicas durante la pausa
+                rb.simulated = false;
             }
 
-            // Opcional: Ocultar el balón o dejarlo quieto en la portería
             RpcSetBallVisibility(ball, false);
         }
 
-        // 2. Esperar el tiempo configurado
+        // 2. Limpiar todo el piso a color neutro (esto cierra automáticamente las porterías)
+        if (FloorGridManager.Instance != null)
+        {
+            FloorGridManager.Instance.ResetAllTiles();
+        }
+
+        // 3. Esperar el tiempo configurado del festejo
         yield return new WaitForSeconds(delay);
 
-        // 3. Reubicar al centro (0, 0) y reactivar físicas
+        // 4. Reubicar al centro (0, 0) y reactivar físicas
         if (ball != null)
         {
             ball.transform.position = Vector3.zero;

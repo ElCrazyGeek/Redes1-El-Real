@@ -44,6 +44,26 @@ public class FloorGridManager : NetworkBehaviour
         }
     }
 
+    // Devuelve true SOLO si el 100% de las casillas pertenecen al equipo indicado
+    public bool IsCourtFullyCoveredByTeam(int teamId)
+    {
+        if (tiles == null || tiles.Count == 0) return false;
+
+        foreach (var tile in tiles.Values)
+        {
+            if (tile == null || tile.paintedByTeam != teamId)
+            {
+                return false; // Si hay una sola casilla neutra o del rival, aún no la domina
+            }
+        }
+        return true;
+    }
+
+    public Color GetTeamColor(int teamId)
+    {
+        return teamId == 1 ? teamAColor : teamBColor;
+    }
+
     [Server]
     public void PaintTileForTeam(Vector3 position, int teamId)
     {
@@ -86,6 +106,38 @@ public class FloorGridManager : NetworkBehaviour
         }
 
         return bestPos;
+    }
+
+
+    // Devuelve true cuando el 100% de las casillas de la cuadrícula han sido pintadas
+    public bool IsCourtFullyCovered()
+    {
+        if (tiles == null || tiles.Count == 0) return false;
+
+        foreach (var tile in tiles.Values)
+        {
+            if (tile != null && tile.paintedByTeam == 0)
+            {
+                return false; // Aún queda al menos una casilla sin manchar
+            }
+        }
+        return true;
+    }
+
+    // Opcional: Devuelve el porcentaje de cobertura (0.0 a 1.0) por si quieres mostrarlo en UI
+    public float GetCoverageProgress()
+    {
+        if (tiles == null || tiles.Count == 0) return 0f;
+
+        int paintedCount = 0;
+        foreach (var tile in tiles.Values)
+        {
+            if (tile != null && tile.paintedByTeam != 0)
+            {
+                paintedCount++;
+            }
+        }
+        return (float)paintedCount / tiles.Count;
     }
 
     // Opcional: Reiniciar toda la cancha a color neutro

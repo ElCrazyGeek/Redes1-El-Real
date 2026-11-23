@@ -608,9 +608,9 @@ MonoBehaviour:
   evaluationMethod: 0
   evaluationInterval: 3
   timeInterpolationGui: 0
-  showRoomGUI: 1
+  showRoomGUI: 0
   minPlayers: 1
-  roomPlayerPrefab: {fileID: 3667995776010902280, guid: 4c039fab4e03c054caa662a9ce92f038, type: 3}
+  roomPlayerPrefab: {fileID: 2026431572345322491, guid: 4c039fab4e03c054caa662a9ce92f038, type: 3}
   RoomScene: Assets/Scenes/RoomScene.unity
   GameplayScene: Assets/Scenes/Juego redes.unity
   _allPlayersReady: 0
