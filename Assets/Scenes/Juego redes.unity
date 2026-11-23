@@ -257,7 +257,7 @@ GameObject:
   - component: {fileID: 281232703}
   - component: {fileID: 281232702}
   - component: {fileID: 281232704}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: wde (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -396,7 +396,7 @@ GameObject:
   - component: {fileID: 286416992}
   - component: {fileID: 286416994}
   - component: {fileID: 286416993}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: wde (10)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -714,7 +714,6 @@ MonoBehaviour:
   syncInterval: 0
   teamThatScores: 2
   lockedColor: {r: 0.4, g: 0.4, b: 0.4, a: 0.5}
-  unlockedColor: {r: 1, g: 0.15127309, b: 0, a: 0.85}
 --- !u!1 &413238459
 GameObject:
   m_ObjectHideFlags: 0
@@ -10514,7 +10513,7 @@ GameObject:
   - component: {fileID: 469302957}
   - component: {fileID: 469302956}
   - component: {fileID: 469302958}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Muros
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10664,7 +10663,7 @@ GameObject:
   - component: {fileID: 517720662}
   - component: {fileID: 517720664}
   - component: {fileID: 517720663}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Muros (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10803,7 +10802,7 @@ GameObject:
   - component: {fileID: 591644306}
   - component: {fileID: 591644305}
   - component: {fileID: 591644304}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: wde (7)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10942,7 +10941,7 @@ GameObject:
   - component: {fileID: 628605407}
   - component: {fileID: 628605406}
   - component: {fileID: 628605405}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: wde (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11081,7 +11080,7 @@ GameObject:
   - component: {fileID: 902330911}
   - component: {fileID: 902330913}
   - component: {fileID: 902330912}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: wde (9)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11399,7 +11398,6 @@ MonoBehaviour:
   syncInterval: 0
   teamThatScores: 1
   lockedColor: {r: 0.4, g: 0.4, b: 0.4, a: 0.5}
-  unlockedColor: {r: 0, g: 0.5101986, b: 1, a: 0.85}
 --- !u!1 &1011830030
 GameObject:
   m_ObjectHideFlags: 0
@@ -11621,7 +11619,7 @@ GameObject:
   - component: {fileID: 1093945223}
   - component: {fileID: 1093945222}
   - component: {fileID: 1093945224}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: wde (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12079,7 +12077,7 @@ GameObject:
   - component: {fileID: 1384111019}
   - component: {fileID: 1384111021}
   - component: {fileID: 1384111020}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: wde (8)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12218,7 +12216,7 @@ GameObject:
   - component: {fileID: 1387073986}
   - component: {fileID: 1387073985}
   - component: {fileID: 1387073984}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: wde (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12357,7 +12355,7 @@ GameObject:
   - component: {fileID: 1524889598}
   - component: {fileID: 1524889597}
   - component: {fileID: 1524889596}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: wde (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13107,7 +13105,7 @@ GameObject:
   - component: {fileID: 2134272964}
   - component: {fileID: 2134272966}
   - component: {fileID: 2134272965}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: wde (11)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

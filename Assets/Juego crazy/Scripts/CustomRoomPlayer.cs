@@ -3,14 +3,30 @@ using Mirror;
 
 public class CustomRoomPlayer : NetworkRoomPlayer
 {
+    public const int MAX_PLAYERS_PER_TEAM = 3;
+
     [Header("Selección de Equipo en Lobby")]
     [SyncVar(hook = nameof(OnTeamSelectedChanged))]
     public int selectedTeam = 1; // 1 = Equipo Azul, 2 = Equipo Rojo
 
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        // Al entrar a la sala, asignarle automáticamente un equipo que tenga espacio (< 3)
+        int countA = CountPlayersInTeam(1);
+        int countB = CountPlayersInTeam(2);
+
+        if (countA <= countB && countA < MAX_PLAYERS_PER_TEAM)
+            selectedTeam = 1;
+        else if (countB < MAX_PLAYERS_PER_TEAM)
+            selectedTeam = 2;
+        else
+            selectedTeam = 1;
+    }
+
     public override void OnStartClient()
     {
         base.OnStartClient();
-        // Si es nuestro jugador local del lobby, le avisamos a la UI para que se conecte con nosotros
         if (isLocalPlayer && LobbyUIManager.Instance != null)
         {
             LobbyUIManager.Instance.RegisterLocalRoomPlayer(this);
@@ -41,11 +57,31 @@ public class CustomRoomPlayer : NetworkRoomPlayer
         RefreshLobbyUI();
     }
 
-    // Llamado desde los botones de la UI del Lobby
     [Command]
     public void CmdSelectTeam(int teamId)
     {
-        selectedTeam = teamId;
+        if (teamId != 1 && teamId != 2) return;
+        if (selectedTeam == teamId) return;
+
+        // Validar en el servidor que el equipo destino no tenga ya 3 jugadores
+        if (CountPlayersInTeam(teamId) < MAX_PLAYERS_PER_TEAM)
+        {
+            selectedTeam = teamId;
+        }
+    }
+
+    public static int CountPlayersInTeam(int teamId)
+    {
+        int count = 0;
+        CustomRoomPlayer[] players = FindObjectsByType<CustomRoomPlayer>(FindObjectsSortMode.None);
+        foreach (var p in players)
+        {
+            if (p != null && p.selectedTeam == teamId)
+            {
+                count++;
+            }
+        }
+        return count;
     }
 
     private void RefreshLobbyUI()
@@ -55,4 +91,4 @@ public class CustomRoomPlayer : NetworkRoomPlayer
             LobbyUIManager.Instance.UpdatePlayerList();
         }
     }
-}
+} 

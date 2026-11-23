@@ -1,26 +1,38 @@
+using System.Collections;
 using UnityEngine;
 using Mirror;
 
 public class PlayerMovement2D : NetworkBehaviour
 {
-    [Header("Configuración")]
+    [Header("Configuración de Movimiento")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float bounceForce = 7f;
 
-    [SyncVar(hook = nameof(OnColorChanged))]
-    private Color playerColor = Color.white;
-
     public Rigidbody2D rb;
-    private SpriteRenderer spriteRenderer;
     private Camera mainCamera;
     private Vector2 moveInput;
+    private TeamMember teamMember;
 
-    [Header("Interacción y Pase")]
+    [Header("Pase (Clic Derecho) y Balonazo Cargado (Clic Izquierdo)")]
     [SerializeField] private float grabRadius = 1.5f;
     [SerializeField] private LayerMask itemLayer;
-    [SerializeField] private float throwForce = 14f;
+    [SerializeField] private float passForce = 13f;
+    [SerializeField] private float minShotForce = 14f;
+    [SerializeField] private float maxShotForce = 26f;
+    [SerializeField] private float maxChargeTime = 1.2f;
 
-    private GrabbableItem heldItem;
+    private bool isChargingShot = false;
+    private float chargeTimer = 0f;
+
+    [Header("Quite Sano (Clic Izq) y Golpe Agresivo (Clic Der)")]
+    [SerializeField] private float actionRange = 1.6f;
+    [SerializeField] private float actionCooldown = 0.6f;
+    [SerializeField] private float stunDuration = 1.6f;
+    [SerializeField] private float attackerPenaltyDuration = 1.0f;
+    private float nextActionTime = 0f;
+
+    [SyncVar]
+    public bool isStunned = false;
 
     [Header("Sonidos y Animación")]
     [SerializeField] private AudioClip grabSound;
@@ -33,10 +45,10 @@ public class PlayerMovement2D : NetworkBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
         mainCamera = Camera.main;
         anim = GetComponent<Animator>();
         networkAnimator = GetComponent<NetworkAnimator>();
+        teamMember = GetComponent<TeamMember>();
 
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
@@ -46,7 +58,6 @@ public class PlayerMovement2D : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
-
         Camera playerCam = GetComponentInChildren<Camera>(true);
         if (playerCam != null)
         {
@@ -54,85 +65,146 @@ public class PlayerMovement2D : NetworkBehaviour
         }
     }
 
+    public GrabbableItem GetHeldBall()
+    {
+        GrabbableItem ball = FindFirstObjectByType<GrabbableItem>();
+        if (ball != null && ball.currentHolder == netIdentity)
+        {
+            return ball;
+        }
+        return null;
+    }
+
     private void Update()
     {
         if (!isLocalPlayer) return;
 
-        // --- 1. MOVIMIENTO DE EJES ---
+        // Si está stuneado o penalizado, se queda parado
+        if (isStunned)
+        {
+            isChargingShot = false;
+            chargeTimer = 0f;
+            moveInput = Vector2.zero;
+            if (anim != null) anim.SetFloat("Movimiento", 0f);
+            return;
+        }
+
+        // --- 1. MOVIMIENTO ---
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
         moveInput = new Vector2(moveX, moveY).normalized;
 
-        // Sincronizar parámetro de caminata en el Animator
         if (anim != null)
         {
             anim.SetFloat("Movimiento", moveInput.sqrMagnitude);
         }
 
-        // --- 2. ROTAR HACIA EL CURSOR DEL MOUSE ---
+        // --- 2. ROTACIÓN AL MOUSE ---
         RotateTowardsMouse();
 
-        // --- 3. AGARRAR CON TECLA 'E' ---
-        if (Input.GetKeyDown(KeyCode.E))
+        GrabbableItem heldItem = GetHeldBall();
+
+        // --- 3. AGARRAR BALÓN SUELTO CON 'E' ---
+        if (Input.GetKeyDown(KeyCode.E) && heldItem == null)
         {
-            if (heldItem == null)
-            {
-                TryGrabNearbyItem();
-            }
+            TryGrabNearbyItem();
         }
 
-        // --- 4. LANZAR Y PATEAR CON CLIC IZQUIERDO ---
-        if (Input.GetMouseButtonDown(0))
+        // ==========================================================
+        // ACCIONES CON EL BALÓN EN POSESIÓN
+        // ==========================================================
+        if (heldItem != null)
         {
-            if (heldItem != null)
+            // CLIC DERECHO: Pase limpio (no hace daño/stun a compañeros ni rivales)
+            if (Input.GetMouseButtonDown(1) && Time.time >= nextActionTime)
             {
-                ThrowItemTowardsMouse();
+                nextActionTime = Time.time + actionCooldown;
+                isChargingShot = false;
+                chargeTimer = 0f;
 
-                // Disparo de trigger replicado por NetworkAnimator
-                if (networkAnimator != null)
-                {
-                    networkAnimator.SetTrigger("Patear");
-                }
-                else if (anim != null)
-                {
-                    anim.SetTrigger("Patear");
-                }
+                Vector2 aimDir = GetMouseDirection();
+                CmdThrowItem(heldItem.gameObject, aimDir, passForce, false);
+                TriggerAnim("Patear");
+            }
+
+            // CLIC IZQUIERDO (MANTENER): Cargar intensidad del balonazo
+            if (Input.GetMouseButtonDown(0) && Time.time >= nextActionTime)
+            {
+                isChargingShot = true;
+                chargeTimer = 0f;
+            }
+
+            if (isChargingShot && Input.GetMouseButton(0))
+            {
+                chargeTimer = Mathf.Clamp(chargeTimer + Time.deltaTime, 0f, maxChargeTime);
+            }
+
+            // CLIC IZQUIERDO (SOLTAR): Disparar balonazo con la intensidad medida
+            if (isChargingShot && Input.GetMouseButtonUp(0))
+            {
+                isChargingShot = false;
+                nextActionTime = Time.time + actionCooldown;
+
+                float chargePercent = chargeTimer / maxChargeTime;
+                float finalShotForce = Mathf.Lerp(minShotForce, maxShotForce, chargePercent);
+
+                Vector2 aimDir = GetMouseDirection();
+                CmdThrowItem(heldItem.gameObject, aimDir, finalShotForce, true);
+                TriggerAnim("Patear");
+                chargeTimer = 0f;
             }
         }
+        // ==========================================================
+        // ACCIONES SIN EL BALÓN EN POSESIÓN
+        // ==========================================================
+        else
+        {
+            isChargingShot = false;
+            chargeTimer = 0f;
+
+            // CLIC IZQUIERDO: Quite normal / "sano" al contrincante
+            if (Input.GetMouseButtonDown(0) && Time.time >= nextActionTime)
+            {
+                nextActionTime = Time.time + actionCooldown;
+                CmdTryStealBall();
+                TriggerAnim("Patear");
+            }
+
+            // CLIC DERECHO: Golpe agresivo (ambos se quedan parados: víctima stuneada, atacante penalizado)
+            if (Input.GetMouseButtonDown(1) && Time.time >= nextActionTime)
+            {
+                nextActionTime = Time.time + actionCooldown;
+                CmdTryAggressiveTackle();
+                TriggerAnim("Patear");
+            }
+        }
+    }
+
+    private void TriggerAnim(string triggerName)
+    {
+        if (networkAnimator != null) networkAnimator.SetTrigger(triggerName);
+        else if (anim != null) anim.SetTrigger(triggerName);
+    }
+
+    private Vector2 GetMouseDirection()
+    {
+        if (mainCamera == null) mainCamera = Camera.main;
+        if (mainCamera == null) return transform.right;
+
+        Vector3 mouseScreen = Input.mousePosition;
+        mouseScreen.z = Mathf.Abs(mainCamera.transform.position.z - transform.position.z);
+        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(mouseScreen);
+
+        Vector2 dir = ((Vector2)mouseWorldPos - (Vector2)transform.position).normalized;
+        return dir.sqrMagnitude > 0.001f ? dir : (Vector2)transform.right;
     }
 
     private void RotateTowardsMouse()
     {
-        if (mainCamera == null) mainCamera = Camera.main;
-        if (mainCamera == null) return;
-
-        Vector3 mouseScreen = Input.mousePosition;
-        mouseScreen.z = Mathf.Abs(mainCamera.transform.position.z - transform.position.z);
-        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(mouseScreen);
-
-        Vector2 lookDir = (Vector2)mouseWorldPos - (Vector2)transform.position;
-
-        if (lookDir.sqrMagnitude > 0.001f)
-        {
-            float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
-            if (rb != null) rb.rotation = angle;
-        }
-    }
-
-    private void ThrowItemTowardsMouse()
-    {
-        if (mainCamera == null) mainCamera = Camera.main;
-        if (mainCamera == null) return;
-
-        Vector3 mouseScreen = Input.mousePosition;
-        mouseScreen.z = Mathf.Abs(mainCamera.transform.position.z - transform.position.z);
-        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(mouseScreen);
-
-        Vector2 aimDirection = ((Vector2)mouseWorldPos - (Vector2)transform.position).normalized;
-
-        CmdThrowItem(heldItem.gameObject, aimDirection, throwForce);
-        heldItem = null;
+        Vector2 lookDir = GetMouseDirection();
+        float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+        if (rb != null) rb.rotation = angle;
     }
 
     private void TryGrabNearbyItem()
@@ -142,7 +214,6 @@ public class PlayerMovement2D : NetworkBehaviour
         {
             if (item.currentHolder == null)
             {
-                heldItem = item;
                 CmdGrabItem(item.gameObject);
             }
         }
@@ -151,6 +222,7 @@ public class PlayerMovement2D : NetworkBehaviour
     [Command]
     private void CmdGrabItem(GameObject itemObject)
     {
+        if (isStunned) return;
         if (itemObject != null && itemObject.TryGetComponent<GrabbableItem>(out GrabbableItem item))
         {
             if (item.currentHolder == null)
@@ -162,43 +234,136 @@ public class PlayerMovement2D : NetworkBehaviour
     }
 
     [Command]
-    private void CmdThrowItem(GameObject itemObject, Vector2 direction, float force)
+    private void CmdThrowItem(GameObject itemObject, Vector2 direction, float force, bool isPowerShot)
     {
+        if (isStunned) return;
         if (itemObject != null && itemObject.TryGetComponent<GrabbableItem>(out GrabbableItem item))
         {
             if (item.currentHolder == netIdentity)
             {
-                item.Throw(direction, force);
+                item.Throw(direction, force, isPowerShot);
                 RpcPlayThrowSound();
             }
         }
     }
 
+    // --- QUITE NORMAL AL CONTRINCANTE (Clic Izquierdo sin balón) ---
+    // --- CLIC IZQUIERDO SIN BALÓN: Quite limpio si hay rival cerca, o pedir pase al bot ---
+    [Command]
+    private void CmdTryStealBall()
+    {
+        if (isStunned) return;
+
+        GrabbableItem ball = FindAnyObjectByType<GrabbableItem>();
+        if (ball == null || ball.currentHolder == null || ball.currentHolder == netIdentity) return;
+
+        int myTeam = teamMember != null ? teamMember.teamId : 1;
+        int holderTeam = myTeam;
+        if (ball.currentHolder.TryGetComponent<TeamMember>(out TeamMember holderTM))
+        {
+            holderTeam = holderTM.teamId;
+        }
+
+        // 1. Si el balón lo tiene un RIVAL y está cerca -> Quite limpio
+        if (myTeam != holderTeam)
+        {
+            float dist = Vector2.Distance(transform.position, ball.currentHolder.transform.position);
+            if (dist <= actionRange && ball.CanBeStolen())
+            {
+                ball.Grab(netIdentity);
+                RpcPlayGrabSound();
+            }
+        }
+        // 2. Si el balón lo tiene un BOT ALIADO (y no tienes rival cerca) -> Pedirle el pase
+        else if (ball.currentHolder.TryGetComponent<BotAIController>(out BotAIController allyBot))
+        {
+            allyBot.ReceivePassRequest(transform);
+        }
+    }
+    // --- GOLPE AGRESIVO (Clic Derecho sin balón: ambos quedan parados) ---
+    [Command]
+    private void CmdTryAggressiveTackle()
+    {
+        if (isStunned) return;
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, actionRange);
+        PlayerMovement2D targetPlayer = null;
+        float closestDist = float.MaxValue;
+
+        foreach (var col in hits)
+        {
+            if (col.gameObject == gameObject) continue;
+            if (col.TryGetComponent<PlayerMovement2D>(out PlayerMovement2D other))
+            {
+                float d = Vector2.Distance(transform.position, other.transform.position);
+                if (d < closestDist)
+                {
+                    closestDist = d;
+                    targetPlayer = other;
+                }
+            }
+        }
+
+        if (targetPlayer != null)
+        {
+            // 1. La víctima suelta el balón y queda stuneada en el sitio
+            targetPlayer.ServerApplyStunAndDrop(Vector2.zero, stunDuration);
+
+            // 2. El atacante también queda parado como penalización (y suelta balón si tuviera)
+            ServerApplyStunAndDrop(Vector2.zero, attackerPenaltyDuration);
+        }
+    }
+
+    [Server]
+    public void ServerApplyStunAndDrop(Vector2 knockbackForce, float duration)
+    {
+        GrabbableItem ball = FindFirstObjectByType<GrabbableItem>();
+        if (ball != null && ball.currentHolder == netIdentity)
+        {
+            ball.Drop();
+        }
+
+        StartCoroutine(StunRoutine(duration));
+        RpcApplyStunEffects(knockbackForce);
+    }
+
+    [Server]
+    private IEnumerator StunRoutine(float duration)
+    {
+        isStunned = true;
+        yield return new WaitForSeconds(duration);
+        isStunned = false;
+    }
+
     [ClientRpc]
     private void RpcPlayGrabSound()
     {
-        if (grabSound != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(grabSound);
-        }
+        if (grabSound != null && audioSource != null) audioSource.PlayOneShot(grabSound);
     }
 
     [ClientRpc]
     private void RpcPlayThrowSound()
     {
-        if (throwSound != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(throwSound);
-        }
+        if (throwSound != null && audioSource != null) audioSource.PlayOneShot(throwSound);
     }
 
     private void FixedUpdate()
     {
         if (!isLocalPlayer) return;
 
+        // Si está stuneado o penalizado, queda completamente parado
+        if (isStunned)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
+        // Si está cargando el balonazo, camina un poco más lento (70% de velocidad)
+        float currentSpeed = isChargingShot ? moveSpeed * 0.7f : moveSpeed;
+
         if (moveInput != Vector2.zero)
         {
-            rb.linearVelocity = moveInput * moveSpeed;
+            rb.linearVelocity = moveInput * currentSpeed;
         }
         else
         {
@@ -209,41 +374,33 @@ public class PlayerMovement2D : NetworkBehaviour
         }
     }
 
-    private void OnColorChanged(Color oldColor, Color newColor)
-    {
-        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.color = newColor;
-    }
-
     [ServerCallback]
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.TryGetComponent<PlayerMovement2D>(out PlayerMovement2D otherPlayer))
         {
-            Color nuevoColor = new Color(Random.value, Random.value, Random.value, 1f);
-            playerColor = nuevoColor;
-
             Vector2 pushDirection = (transform.position - collision.transform.position).normalized;
-            RpcApplyKnockback(pushDirection * bounceForce);
+            RpcApplyKnockbackOnly(pushDirection * (bounceForce * 0.6f));
         }
     }
 
     [ClientRpc]
-    private void RpcApplyKnockback(Vector2 force)
+    private void RpcApplyStunEffects(Vector2 force)
     {
         if (rb != null)
         {
-            rb.AddForce(force, ForceMode2D.Impulse);
+            rb.linearVelocity = Vector2.zero;
+            if (force != Vector2.zero) rb.AddForce(force, ForceMode2D.Impulse);
         }
 
-        if (anim != null)
-        {
-            anim.SetTrigger("Golpe");
-        }
+        if (anim != null) anim.SetTrigger("Golpe");
+        if (bumpSound != null && audioSource != null) audioSource.PlayOneShot(bumpSound);
+    }
 
-        if (bumpSound != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(bumpSound);
-        }
+    [ClientRpc]
+    private void RpcApplyKnockbackOnly(Vector2 force)
+    {
+        if (rb != null) rb.AddForce(force, ForceMode2D.Impulse);
+        if (bumpSound != null && audioSource != null) audioSource.PlayOneShot(bumpSound);
     }
 }

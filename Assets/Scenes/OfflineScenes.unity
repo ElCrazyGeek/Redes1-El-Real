@@ -585,14 +585,16 @@ MonoBehaviour:
   offlineSceneLoadDelay: 0
   transport: {fileID: 1640814928}
   networkAddress: localhost
-  maxConnections: 100
+  maxConnections: 6
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
   playerPrefab: {fileID: 2907189413313525986, guid: ec173a415adc7384fb872abe6edcedb1, type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
-  spawnPrefabs: []
+  spawnPrefabs:
+  - {fileID: 2907189413313525986, guid: 9ff0a8cbd58c8ad47a25cc22b71ed47f, type: 3}
+  - {fileID: 1789925357987693082, guid: 3499dec43a891e74ca629be669bd6ca7, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -617,6 +619,16 @@ MonoBehaviour:
   clientIndex: 0
   teamAColor: {r: 0.2, g: 0.8, b: 1, a: 1}
   teamBColor: {r: 1, g: 0.35, b: 0.35, a: 1}
+  botPrefab: {fileID: 2907189413313525986, guid: 9ff0a8cbd58c8ad47a25cc22b71ed47f, type: 3}
+  targetPlayersPerTeam: 3
+  teamASpawnPoints:
+  - {x: -4, y: 2}
+  - {x: -4, y: 0}
+  - {x: -4, y: -2}
+  teamBSpawnPoints:
+  - {x: 4, y: 2}
+  - {x: 4, y: 0}
+  - {x: 4, y: -2}
 --- !u!1 &1734856024
 GameObject:
   m_ObjectHideFlags: 0

@@ -76,8 +76,10 @@ public class LobbyUIManager : MonoBehaviour
 
     public void UpdatePlayerList()
     {
-        string listA = "<b>EQUIPO AZUL</b>\n";
-        string listB = "<b>EQUIPO ROJO</b>\n";
+        int countA = 0;
+        int countB = 0;
+        string linesA = "";
+        string linesB = "";
 
         CustomRoomPlayer[] players = FindObjectsByType<CustomRoomPlayer>(FindObjectsSortMode.None);
         foreach (var p in players)
@@ -86,12 +88,32 @@ public class LobbyUIManager : MonoBehaviour
             string tag = p.isLocalPlayer ? " (Tú)" : "";
             string line = $"Jugador {p.index + 1}{tag} {status}\n";
 
-            if (p.selectedTeam == 1) listA += line;
-            else listB += line;
+            if (p.selectedTeam == 1)
+            {
+                countA++;
+                linesA += line;
+            }
+            else
+            {
+                countB++;
+                linesB += line;
+            }
         }
 
-        if (teamAListText != null) teamAListText.text = listA;
-        if (teamBListText != null) teamBListText.text = listB;
+        int max = CustomRoomPlayer.MAX_PLAYERS_PER_TEAM;
+
+        if (teamAListText != null)
+            teamAListText.text = $"<b>EQUIPO AZUL ({countA}/{max})</b>\n{linesA}";
+
+        if (teamBListText != null)
+            teamBListText.text = $"<b>EQUIPO ROJO ({countB}/{max})</b>\n{linesB}";
+
+        // Desactivar botón si el equipo ya llegó a 3 jugadores (o si ya estás en ese equipo)
+        if (btnTeamA != null)
+            btnTeamA.interactable = (countA < max) && (localRoomPlayer == null || localRoomPlayer.selectedTeam != 1);
+
+        if (btnTeamB != null)
+            btnTeamB.interactable = (countB < max) && (localRoomPlayer == null || localRoomPlayer.selectedTeam != 2);
 
         if (localRoomPlayer != null && btnReadyText != null)
         {

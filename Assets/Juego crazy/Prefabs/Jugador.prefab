@@ -126,7 +126,15 @@ MonoBehaviour:
   itemLayer:
     serializedVersion: 2
     m_Bits: 64
-  throwForce: 12
+  passForce: 13
+  minShotForce: 14
+  maxShotForce: 26
+  maxChargeTime: 1.2
+  actionRange: 1.6
+  actionCooldown: 0.6
+  stunDuration: 1.6
+  attackerPenaltyDuration: 1
+  isStunned: 0
   grabSound: {fileID: 8300000, guid: 2dca47b728a1b4471b826a66c8b19485, type: 3}
   throwSound: {fileID: 0}
   bumpSound: {fileID: 0}
@@ -191,7 +199,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.004870087, y: -0.004870057}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -201,7 +209,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.64935476, y: 0.87337804}
   m_EdgeRadius: 0
 --- !u!114 &741182295236866861
 MonoBehaviour:

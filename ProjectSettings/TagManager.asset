@@ -9,11 +9,11 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Suelo
+  - Obstaculos
   - Water
   - UI
+  - Suelo
   - Interactuable
-  - 
   - 
   - 
   - 

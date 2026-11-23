@@ -9,12 +9,25 @@ public class GrabbableItem : NetworkBehaviour
     [SyncVar]
     public int lastTeamTouch = 1;
 
-    [Header("Sonido")]
+    [SyncVar]
+    public bool isPowerShot = false;
+
+    [Header("Sonido y Balonazo")]
     [SerializeField] private AudioClip bounceSound;
+    [SerializeField] private float minPowerShotSpeed = 9f; // Velocidad mínima para seguir stuneando
     private AudioSource audioSource;
 
     private Rigidbody2D rb;
     private Collider2D col;
+
+    [Header("Protección Anti-Robo")]
+    [SerializeField] private float stealProtectionDuration = 0.9f;
+    private float lastGrabTime = -10f;
+
+    public bool CanBeStolen()
+    {
+        return Time.time >= lastGrabTime + stealProtectionDuration;
+    }
 
     private void Awake()
     {
@@ -27,15 +40,19 @@ public class GrabbableItem : NetworkBehaviour
 
     private void Update()
     {
-        // Mientras esté agarrado, el balón se posiciona frente al jugador
         if (currentHolder != null)
         {
-            // Tomamos la rotación actual del jugador y lo colocamos 0.8 unidades hacia su frente
             Vector3 forwardOffset = currentHolder.transform.right * 0.8f;
-            // Si tu personaje usa transform.up en vez de right, cambia a: currentHolder.transform.up * 0.8f
-
             transform.position = currentHolder.transform.position + forwardOffset;
-            transform.rotation = Quaternion.identity; // Mantener el balón sin rotaciones raras
+            transform.rotation = Quaternion.identity;
+        }
+        else if (isServer && isPowerShot && rb != null)
+        {
+            // Cuando el balonazo pierde velocidad, deja de stunear
+            if (rb.linearVelocity.magnitude < minPowerShotSpeed)
+            {
+                isPowerShot = false;
+            }
         }
     }
 
@@ -43,7 +60,6 @@ public class GrabbableItem : NetworkBehaviour
     {
         if (newHolder != null)
         {
-            // Desactivamos la física mientras lo carga
             if (rb != null)
             {
                 rb.bodyType = RigidbodyType2D.Kinematic;
@@ -54,7 +70,6 @@ public class GrabbableItem : NetworkBehaviour
         }
         else
         {
-            // Reactivamos física al soltarlo
             if (rb != null)
             {
                 rb.bodyType = RigidbodyType2D.Dynamic;
@@ -66,44 +81,73 @@ public class GrabbableItem : NetworkBehaviour
     [Server]
     public void Grab(NetworkIdentity player)
     {
+        // Si alguien ya tenía el balón y se lo acaban de quitar, le avisamos al bot anterior
+        if (currentHolder != null && currentHolder != player)
+        {
+            if (currentHolder.TryGetComponent<BotAIController>(out BotAIController previousBot))
+            {
+                previousBot.OnBallLostOrStolen();
+            }
+        }
+
         if (player.TryGetComponent<TeamMember>(out TeamMember tm))
         {
             lastTeamTouch = tm.teamId;
         }
+        isPowerShot = false;
         currentHolder = player;
+        lastGrabTime = Time.time;
     }
 
     [Server]
     public void Drop()
     {
+        isPowerShot = false;
         currentHolder = null;
     }
 
     [Server]
-    public void Throw(Vector2 throwDirection, float force)
+    public void Throw(Vector2 throwDirection, float force, bool powerShot = false)
     {
         if (currentHolder != null)
         {
-            // Colocar el balón un paso por delante para que no choque con el cuerpo del jugador
-            transform.position = currentHolder.transform.position + (Vector3)(throwDirection * 0.9f);
+            // Margen seguro para no golpear al lanzador en el instante 0
+            transform.position = currentHolder.transform.position + (Vector3)(throwDirection * 1.1f);
         }
 
-        currentHolder = null; // Esto dispara OnHolderChanged en todos los clientes
+        currentHolder = null;
+        isPowerShot = powerShot;
 
         if (rb != null)
         {
             rb.bodyType = RigidbodyType2D.Dynamic;
-
-            // Asignación directa de velocidad de salida:
             rb.linearVelocity = throwDirection * force;
-            // (Si tu versión de Unity no reconoce linearVelocity, usa: rb.velocity = throwDirection * force;)
         }
     }
 
     [ServerCallback]
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (currentHolder == null && collision.relativeVelocity.magnitude > 1f)
+        if (currentHolder != null) return;
+
+        // Solo el balonazo (isPowerShot == true) stunea a compañeros, rivales o al mismo jugador
+        if (isPowerShot)
+        {
+            if (collision.gameObject.TryGetComponent<PlayerMovement2D>(out PlayerMovement2D hitPlayer))
+            {
+                isPowerShot = false;
+                Vector2 knockDir = (hitPlayer.transform.position - transform.position).normalized;
+                hitPlayer.ServerApplyStunAndDrop(knockDir * 9f, 1.6f);
+            }
+            else if (collision.gameObject.TryGetComponent<BotAIController>(out BotAIController hitBot))
+            {
+                isPowerShot = false;
+                Vector2 knockDir = (hitBot.transform.position - transform.position).normalized;
+                hitBot.ServerApplyStunAndDrop(knockDir * 9f, 1.6f);
+            }
+        }
+
+        if (collision.relativeVelocity.magnitude > 1f)
         {
             RpcPlayBounceSound();
         }

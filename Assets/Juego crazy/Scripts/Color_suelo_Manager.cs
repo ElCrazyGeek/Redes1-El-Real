@@ -124,6 +124,40 @@ public class FloorGridManager : NetworkBehaviour
         return true;
     }
 
+    // Busca una casilla sin pintar por el equipo, priorizando zonas alejadas de otros aliados
+    public Vector2 GetSpreadUnpaintedTile(int myTeamId, Vector2 myPos, List<Vector2> teammatePositions)
+    {
+        Vector2 bestPos = myPos;
+        float bestScore = float.MinValue;
+
+        foreach (var kvp in tiles)
+        {
+            FloorTile tile = kvp.Value;
+            if (tile == null || tile.paintedByTeam == myTeamId) continue;
+
+            Vector2 tilePos = tile.transform.position;
+            float distToMe = Vector2.Distance(myPos, tilePos);
+
+            // Calcular qué tan lejos está esta casilla de los compañeros de equipo
+            float minDistToTeammate = 10f;
+            foreach (Vector2 matePos in teammatePositions)
+            {
+                float d = Vector2.Distance(tilePos, matePos);
+                if (d < minDistToTeammate) minDistToTeammate = d;
+            }
+
+            // Puntuación: queremos casillas cerca de mí, pero BIEN ALEJADAS de mis compañeros
+            float score = (minDistToTeammate * 2.5f) - distToMe;
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestPos = tilePos;
+            }
+        }
+
+        return bestPos;
+    }
+
     // Opcional: Devuelve el porcentaje de cobertura (0.0 a 1.0) por si quieres mostrarlo en UI
     public float GetCoverageProgress()
     {
