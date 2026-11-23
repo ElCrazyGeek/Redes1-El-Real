@@ -6,6 +6,9 @@ public class GrabbableItem : NetworkBehaviour
     [SyncVar(hook = nameof(OnHolderChanged))]
     public NetworkIdentity currentHolder;
 
+    [SyncVar]
+    public int lastTeamTouch = 1;
+
     [Header("Sonido")]
     [SerializeField] private AudioClip bounceSound;
     private AudioSource audioSource;
@@ -63,6 +66,10 @@ public class GrabbableItem : NetworkBehaviour
     [Server]
     public void Grab(NetworkIdentity player)
     {
+        if (player.TryGetComponent<TeamMember>(out TeamMember tm))
+        {
+            lastTeamTouch = tm.teamId;
+        }
         currentHolder = player;
     }
 

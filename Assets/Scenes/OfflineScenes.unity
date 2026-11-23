@@ -467,10 +467,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1640814930}
-  - component: {fileID: 1640814929}
   - component: {fileID: 1640814928}
   - component: {fileID: 1640814932}
   - component: {fileID: 1640814931}
+  - component: {fileID: 1640814933}
   m_Layer: 0
   m_Name: RoomNetworkManager
   m_TagString: Untagged
@@ -502,58 +502,6 @@ MonoBehaviour:
   clientMaxReceivesPerTick: 1000
   clientSendQueueLimit: 10000
   clientReceiveQueueLimit: 10000
---- !u!114 &1640814929
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1640814927}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 615e6c6589cf9e54cad646b5a11e0529, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Mirror.Components::Mirror.NetworkRoomManager
-  dontDestroyOnLoad: 1
-  runInBackground: 1
-  headlessStartMode: 0
-  editorAutoStart: 0
-  sendRate: 60
-  offlineScene: Assets/Scenes/OfflineScenes.unity
-  onlineScene: Assets/Scenes/RoomScene.unity
-  offlineSceneLoadDelay: 0
-  transport: {fileID: 1640814928}
-  networkAddress: localhost
-  maxConnections: 100
-  disconnectInactiveConnections: 0
-  disconnectInactiveTimeout: 60
-  authenticator: {fileID: 0}
-  playerPrefab: {fileID: 2907189413313525986, guid: ec173a415adc7384fb872abe6edcedb1, type: 3}
-  autoCreatePlayer: 1
-  playerSpawnMethod: 0
-  spawnPrefabs: []
-  exceptionsDisconnect: 1
-  snapshotSettings:
-    bufferTimeMultiplier: 2
-    bufferLimit: 32
-    catchupNegativeThreshold: -1
-    catchupPositiveThreshold: 1
-    catchupSpeed: 0.019999999552965164
-    slowdownSpeed: 0.03999999910593033
-    driftEmaDuration: 1
-    dynamicAdjustment: 1
-    dynamicAdjustmentTolerance: 1
-    deliveryTimeEmaDuration: 2
-  evaluationMethod: 0
-  evaluationInterval: 3
-  timeInterpolationGui: 0
-  showRoomGUI: 1
-  minPlayers: 2
-  roomPlayerPrefab: {fileID: 3667995776010902280, guid: 4c039fab4e03c054caa662a9ce92f038, type: 3}
-  RoomScene: Assets/Scenes/RoomScene.unity
-  GameplayScene: Assets/Scenes/Juego redes.unity
-  _allPlayersReady: 0
-  clientIndex: 0
 --- !u!4 &1640814930
 Transform:
   m_ObjectHideFlags: 0
@@ -615,6 +563,60 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   secretHandshake: 1745667388532106046
+--- !u!114 &1640814933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640814927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1472ce7f8fa3784eb65dbb041130968, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeamRoomManager
+  dontDestroyOnLoad: 1
+  runInBackground: 1
+  headlessStartMode: 0
+  editorAutoStart: 0
+  sendRate: 60
+  offlineScene: Assets/Scenes/OfflineScenes.unity
+  onlineScene: Assets/Scenes/RoomScene.unity
+  offlineSceneLoadDelay: 0
+  transport: {fileID: 1640814928}
+  networkAddress: localhost
+  maxConnections: 100
+  disconnectInactiveConnections: 0
+  disconnectInactiveTimeout: 60
+  authenticator: {fileID: 0}
+  playerPrefab: {fileID: 2907189413313525986, guid: ec173a415adc7384fb872abe6edcedb1, type: 3}
+  autoCreatePlayer: 1
+  playerSpawnMethod: 0
+  spawnPrefabs: []
+  exceptionsDisconnect: 1
+  snapshotSettings:
+    bufferTimeMultiplier: 2
+    bufferLimit: 32
+    catchupNegativeThreshold: -1
+    catchupPositiveThreshold: 1
+    catchupSpeed: 0.019999999552965164
+    slowdownSpeed: 0.03999999910593033
+    driftEmaDuration: 1
+    dynamicAdjustment: 1
+    dynamicAdjustmentTolerance: 1
+    deliveryTimeEmaDuration: 2
+  evaluationMethod: 0
+  evaluationInterval: 3
+  timeInterpolationGui: 0
+  showRoomGUI: 1
+  minPlayers: 1
+  roomPlayerPrefab: {fileID: 3667995776010902280, guid: 4c039fab4e03c054caa662a9ce92f038, type: 3}
+  RoomScene: Assets/Scenes/RoomScene.unity
+  GameplayScene: Assets/Scenes/Juego redes.unity
+  _allPlayersReady: 0
+  clientIndex: 0
+  teamAColor: {r: 0.2, g: 0.8, b: 1, a: 1}
+  teamBColor: {r: 1, g: 0.35, b: 0.35, a: 1}
 --- !u!1 &1734856024
 GameObject:
   m_ObjectHideFlags: 0

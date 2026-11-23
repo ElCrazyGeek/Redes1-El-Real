@@ -3,9 +3,10 @@ using Mirror;
 
 public class FloorTile : MonoBehaviour
 {
-    [SerializeField] private Color paintedColor = Color.cyan;
     private SpriteRenderer sr;
-    private bool isPainted = false;
+
+    // 0 = sin pintar, 1 = Equipo A, 2 = Equipo B
+    public int paintedByTeam = 0;
 
     private void Awake()
     {
@@ -15,23 +16,28 @@ public class FloorTile : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!NetworkServer.active) return;
-        if (isPainted) return;
 
-        // Si lo que colisiona es el balón
+        // Validamos si lo que pasó encima es el balón
         if (collision.TryGetComponent<GrabbableItem>(out GrabbableItem ball))
         {
-            isPainted = true;
+            int teamId = ball.lastTeamTouch;
 
-            // Llamamos al manager de la malla si existe
-            if (FloorGridManager.Instance != null)
+            // Si el equipo es válido y la casilla aún no pertenece a ese equipo
+            if (teamId > 0 && paintedByTeam != teamId)
             {
-                FloorGridManager.Instance.RpcPaintTile(transform.position, paintedColor);
+                paintedByTeam = teamId;
+
+                if (FloorGridManager.Instance != null)
+                {
+                    FloorGridManager.Instance.PaintTileForTeam(transform.position, teamId);
+                }
             }
         }
     }
 
-    public void Paint(Color newColor)
+    public void Paint(Color newColor, int teamId)
     {
+        paintedByTeam = teamId;
         if (sr != null)
         {
             sr.color = newColor;

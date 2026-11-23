@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 8563753003170697120}
   - component: {fileID: 317157664374916308}
   - component: {fileID: 8339905671429398046}
+  - component: {fileID: 6847608286358734215}
   m_Layer: 0
   m_Name: Jugador
   m_TagString: Interactable
@@ -406,6 +407,23 @@ MonoBehaviour:
   syncInterval: 0
   clientAuthority: 0
   animator: {fileID: 317157664374916308}
+--- !u!114 &6847608286358734215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2907189413313525986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0e1e91a7cfa2e441a6c6b201b43b5b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeamMember
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  teamId: 1
+  teamColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!1 &5403111252947091322
 GameObject:
   m_ObjectHideFlags: 0
