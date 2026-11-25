@@ -79,6 +79,15 @@ public class PlayerMovement2D : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
 
+        if (MatchTimer.Instance != null && !MatchTimer.Instance.isMatchRunning)
+        {
+            isChargingShot = false;
+            chargeTimer = 0f;
+            moveInput = Vector2.zero;
+            if (anim != null) anim.SetFloat("Movimiento", 0f);
+            return;
+        }
+
         // Si está stuneado o penalizado, se queda parado
         if (isStunned)
         {
@@ -350,6 +359,15 @@ public class PlayerMovement2D : NetworkBehaviour
     private void FixedUpdate()
     {
         if (!isLocalPlayer) return;
+
+        if (!isLocalPlayer) return;
+
+        // Frenar el movimiento físico al terminar la partida
+        if (MatchTimer.Instance != null && !MatchTimer.Instance.isMatchRunning)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
 
         // Si está stuneado o penalizado, queda completamente parado
         if (isStunned)

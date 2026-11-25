@@ -63,6 +63,10 @@ public class Marcador : NetworkBehaviour
     [Server]
     public void AddGoal(int teamId, GameObject ball)
     {
+
+        // No contar goles si el tiempo ya se terminó
+        if (MatchTimer.Instance != null && !MatchTimer.Instance.isMatchRunning) return;
+
         if (isHandlingGoal) return;
         isHandlingGoal = true;
 

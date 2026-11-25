@@ -86,6 +86,14 @@ public class BotAIController : NetworkBehaviour
     [ServerCallback]
     private void Update()
     {
+
+        if (MatchTimer.Instance != null && !MatchTimer.Instance.isMatchRunning)
+        {
+            currentMoveDir = Vector2.zero;
+            UpdateAnimation(0f);
+            return;
+        }
+
         if (isStunned)
         {
             currentMoveDir = Vector2.zero;
@@ -402,6 +410,11 @@ public class BotAIController : NetworkBehaviour
     [ServerCallback]
     private void FixedUpdate()
     {
+        if (MatchTimer.Instance != null && !MatchTimer.Instance.isMatchRunning)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
         if (isStunned)
         {
             rb.linearVelocity = Vector2.zero;
