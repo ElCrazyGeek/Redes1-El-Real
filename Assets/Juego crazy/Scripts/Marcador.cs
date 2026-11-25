@@ -63,20 +63,75 @@ public class Marcador : NetworkBehaviour
     [Server]
     public void AddGoal(int teamId, GameObject ball)
     {
-
-        // No contar goles si el tiempo ya se terminó
-        if (MatchTimer.Instance != null && !MatchTimer.Instance.isMatchRunning) return;
-
         if (isHandlingGoal) return;
         isHandlingGoal = true;
 
-        if (teamId == 1) scoreTeamA++;
-        else scoreTeamB++;
+        if (teamId == 1)
+        {
+            scoreTeamA++;
+            if (MatchTimer.Instance != null) MatchTimer.Instance.AddGoalTeamA();
+        }
+        else
+        {
+            scoreTeamB++;
+            if (MatchTimer.Instance != null) MatchTimer.Instance.AddGoalTeamB();
+        }
 
-        // Enviamos a todos los clientes qué equipo/portería debe lanzar partículas
         RpcPlayGoalEffect(teamId);
-
         StartCoroutine(GoalDelayRoutine(ball, goalResetDelay));
+    }
+
+    [Server]
+    private IEnumerator GoalDelayRoutine(GameObject ball, float delay)
+    {
+        try
+        {
+            // 1. Soltar el balón y congelar su física
+            if (ball != null)
+            {
+                if (ball.TryGetComponent<GrabbableItem>(out GrabbableItem item))
+                {
+                    item.Drop();
+                }
+
+                if (ball.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
+                {
+                    rb.linearVelocity = Vector2.zero;
+                    rb.angularVelocity = 0f;
+                    rb.simulated = false;
+                }
+
+                RpcSetBallVisibility(ball, false);
+            }
+
+            // 2. Limpiar toda la pintura del piso (cierra las porterías)
+            if (FloorGridManager.Instance != null)
+            {
+                FloorGridManager.Instance.ResetAllTiles();
+            }
+
+            // 3. Esperar el tiempo de festejo
+            yield return new WaitForSeconds(delay);
+
+            // 4. Regresar el balón al centro (0,0) y reactivar físicas
+            if (ball != null)
+            {
+                ball.transform.position = Vector3.zero;
+
+                if (ball.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
+                {
+                    rb.simulated = true;
+                    rb.linearVelocity = Vector2.zero;
+                    rb.angularVelocity = 0f;
+                }
+
+                RpcSetBallVisibility(ball, true);
+            }
+        }
+        finally
+        {
+            isHandlingGoal = false;
+        }
     }
 
     [ClientRpc]
@@ -99,53 +154,6 @@ public class Marcador : NetworkBehaviour
         }
     }
 
-    [Server]
-    private IEnumerator GoalDelayRoutine(GameObject ball, float delay)
-    {
-        // 1. Pausar física y soltar el balón
-        if (ball != null)
-        {
-            if (ball.TryGetComponent<GrabbableItem>(out GrabbableItem item))
-            {
-                item.Drop();
-            }
-
-            if (ball.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
-            {
-                rb.linearVelocity = Vector2.zero;
-                rb.angularVelocity = 0f;
-                rb.simulated = false;
-            }
-
-            RpcSetBallVisibility(ball, false);
-        }
-
-        // 2. Limpiar todo el piso a color neutro (esto cierra automáticamente las porterías)
-        if (FloorGridManager.Instance != null)
-        {
-            FloorGridManager.Instance.ResetAllTiles();
-        }
-
-        // 3. Esperar el tiempo configurado del festejo
-        yield return new WaitForSeconds(delay);
-
-        // 4. Reubicar al centro (0, 0) y reactivar físicas
-        if (ball != null)
-        {
-            ball.transform.position = Vector3.zero;
-
-            if (ball.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
-            {
-                rb.simulated = true;
-                rb.linearVelocity = Vector2.zero;
-                rb.angularVelocity = 0f;
-            }
-
-            RpcSetBallVisibility(ball, true);
-        }
-
-        isHandlingGoal = false;
-    }
 
     [ClientRpc]
     private void RpcSetBallVisibility(GameObject ball, bool visible)

@@ -14,7 +14,7 @@ public class MatchTimer : NetworkBehaviour
     public bool isMatchRunning = true;
 
     [Header("2. Marcador Sincronizado")]
-    [SyncVar] public int scoreTeamA = 0; // Equipo Azul (1)
+    [SyncVar] public int scoreTeamA =0; // Equipo Azul (1)
     [SyncVar] public int scoreTeamB = 0; // Equipo Rojo (2)
 
     [Header("UI - Reloj en Pantalla")]
