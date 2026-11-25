@@ -620,7 +620,7 @@ MonoBehaviour:
   teamAColor: {r: 0.2, g: 0.8, b: 1, a: 1}
   teamBColor: {r: 1, g: 0.35, b: 0.35, a: 1}
   botPrefab: {fileID: 2907189413313525986, guid: 9ff0a8cbd58c8ad47a25cc22b71ed47f, type: 3}
-  targetPlayersPerTeam: 3
+  targetPlayersPerTeam: 1
   teamASpawnPoints:
   - {x: -4, y: 2}
   - {x: -4, y: 0}

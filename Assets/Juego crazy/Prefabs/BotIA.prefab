@@ -394,9 +394,8 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  moveSpeed: 4.6
-  rotationSpeed: 12
-  bounceForce: 7
+  moveSpeed: 2.5
+  rotationSpeed: 8
   grabRadius: 1.4
   stealRange: 1.5
   passForce: 13
@@ -404,9 +403,10 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 8
-  actionCooldown: 0.8
+  actionCooldown: 1
   minHoldTimeBeforePass: 1.2
-  stunDuration: 1.6
+  stealRecoveryDelay: 3.5
+  stunDuration: 2.5
   grabSound: {fileID: 0}
   throwSound: {fileID: 8300000, guid: 23eaa3c9034d1dd4fab731ffb0e08dd8, type: 3}
   bumpSound: {fileID: 8300000, guid: 03dcf882385799e41be6037612d01e69, type: 3}
